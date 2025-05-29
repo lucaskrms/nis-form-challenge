@@ -16,12 +16,17 @@ class CitizenService
 
     public function registerCitizen(string $name): Citizen
     {
+        $name = trim($name);
+    
+        if (count(preg_split('/\s+/', $name)) < 2) {
+        throw new \InvalidArgumentException("O nome deve conter ao menos dois termos.");
+    }
+    
         try {
             $nis = $this->generateNis();
             $citizen = new Citizen($name, $nis);
-
+        
             $this->repository->save($citizen);
-            
             return $citizen;
         } catch(\PDOException $e){
             throw new \RuntimeException("Erro ao salvar cidadão.", 0, $e);
@@ -30,6 +35,10 @@ class CitizenService
 
     public function findCitizenByNis(string $nis): ?Citizen
     {
+        if (!preg_match('/^\d{11}$/', $nis)) {
+            throw new \InvalidArgumentException("O NIS deve conter exatamente 11 dígitos numéricos.");
+        }
+
         try {
             return $this->repository->findByNis($nis);
         } catch (\PDOException $e) {

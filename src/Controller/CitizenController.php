@@ -20,19 +20,15 @@ class CitizenController
 
     public function register(array $data): void
     {
-        $name = trim($data['name'] ?? '');
-
-        if ($name === '') {
-            $message = "Nome inválido.";
-        } else {
-            try {
-                $citizen = $this->service->registerCitizen($name);
-                $message = "Cidadão cadastrado com sucesso! NIS: " . $citizen->getNis();
-            } catch (RuntimeException $e) {
-                $message = "Erro ao cadastrar cidadão: " . $e->getMessage();
-            }
+        try {
+            $citizen = $this->service->registerCitizen($data['name'] ?? '');
+            $message = "Cidadão cadastrado com sucesso! NIS: " . $citizen->getNis();
+        } catch (\InvalidArgumentException $e) {
+            $message = "Nome inválido: " . $e->getMessage();
+        } catch (\RuntimeException $e) {
+            $message = "Erro ao cadastrar cidadão: " . $e->getMessage();
         }
-
+    
         $this->render('result', ['message' => $message]);
     }
 
@@ -40,17 +36,15 @@ class CitizenController
     {
         $nis = trim($data['nis'] ?? '');
 
-        if ($nis === '') {
-            $message = "NIS não informado.";
-        } else {
-            try {
-                $citizen = $this->service->findCitizenByNis($nis);
-                $message = $citizen
-                    ? "Cidadão encontrado: {$citizen->getName()} (NIS: {$citizen->getNis()})"
-                    : "Cidadão não encontrado.";
-            } catch (RuntimeException $e) {
-                $message = "Erro ao buscar cidadão: " . $e->getMessage();
-            }
+        try {
+            $citizen = $this->service->findCitizenByNis($nis);
+            $message = $citizen
+                ? "Cidadão encontrado: {$citizen->getName()} (NIS: {$citizen->getNis()})"
+                : "Cidadão não encontrado.";
+        } catch (\InvalidArgumentException $e) {
+            $message = "Entrada inválida: " . $e->getMessage();
+        } catch (\RuntimeException $e) {
+            $message = "Erro ao buscar cidadão: " . $e->getMessage();
         }
 
         $this->render('result', ['message' => $message]);
