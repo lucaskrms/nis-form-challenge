@@ -1,0 +1,11 @@
+{
+  "name": "lucaskrms/nis-form-challenge",
+  "description": "PHP challenge to register and search citizens by NIS",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "require": {}
+}
